@@ -36,7 +36,7 @@ exports.scraping = functions.runWith(runtimeOpts).https.onRequest(async (request
             if(typeof url === 'string'){
                 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']});
                 const page = await browser.newPage();
-                await page.goto(url);
+                await page.goto(url, {waitUntil: ['load', 'networkidle2'], timeout: 0});
 
                 const pageTitle = await page.title();
 

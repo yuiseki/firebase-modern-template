@@ -11,6 +11,16 @@
   },
   "hosting": {
     "public": "public",
+    "rewrites": [
+      {
+        "source": "/helloWorld",
+        "function": "helloWorld"
+      },
+      {
+        "source": "/scraping",
+        "function": "scraping"
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",

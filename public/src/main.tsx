@@ -16,4 +16,5 @@ const MainView: React.FC = () => {
     </div>
 }
 
+// MainView を app という id の Elementの子として描画する
 ReactDOM.render(<MainView />, document.getElementById("app"));

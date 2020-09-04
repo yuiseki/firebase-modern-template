@@ -5,6 +5,7 @@ import { RuntimeOptions } from 'firebase-functions';
 
 export const helloWorld = functions.https.onRequest((request, response) => {
     functions.logger.info("Hello logs!", {structuredData: true});
+    // functions で query parameter を使う例
     switch (request.query.lang) {
         case 'ja':
             response.send("こんにちは");
@@ -41,6 +42,7 @@ exports.scraping = functions.runWith(runtimeOpts).https.onRequest(async (request
                 const pageTitle = await page.title();
 
                 await browser.close();
+                
                 return response.status(200).json({ status: "finished", url: url, title: pageTitle });
             }else{
                 return response.status(400).send('request.query.url is not string')

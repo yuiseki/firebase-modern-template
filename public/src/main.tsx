@@ -7,9 +7,14 @@ import HelloUser from "./HelloUser";
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 declare const firebase: typeof import('firebase');
+//declare const firestore: typeof import('firebase/firestore');
+
+//import firebase from '@firebase/app';
+import '@firebase/auth';
+import '@firebase/firestore';
 
 const useCurrentUser = () => {
-    const [currentUser, setCurrentUser] = useState<null | object>(null);
+    const [currentUser, setCurrentUser] = useState<null | object>(firebase.auth().currentUser);
     const provider = new firebase.auth.TwitterAuthProvider();
     useEffect(() => {
         firebase.auth().onAuthStateChanged(user => {
@@ -21,11 +26,23 @@ const useCurrentUser = () => {
             }
         });
         firebase.auth().getRedirectResult().then(function(result) {
-            if (result.credential) {
-                // TODO: あとでDBに保存する
-                var credential = result.credential;
-            }
             setCurrentUser(result.user);
+            if (result.credential) {
+                // DBに保存する
+                var accessToken = result.credential.accessToken;
+                var secret = result.credential.secret;
+                var db = firebase.firestore()
+                db.collection("TwitterUsers").doc(result.user.uid).set({
+                    accessToken: accessToken,
+                    secret: secret
+                })
+                /*
+                firebase.database().ref('/TwitterUsers/'+result.user.uid).set({
+                    accessToken: accessToken,
+                    secret: secret
+                })
+                */
+            }
         }).catch(function(error) {
             console.log(error);
         });
@@ -33,15 +50,27 @@ const useCurrentUser = () => {
     return currentUser;
 }
 
+const LogoutButton: React.FC = () => {
+    const onClick = useCallback(()=>{
+        firebase.auth().signOut();
+        location.reload();
+    }, []);
+    return <div>
+        <input type="button" value="logout" onClick={onClick} />
+    </div>
+}
+
 const MainView: React.FC = () => {
     const currentUser = useCurrentUser();
+    console.log(currentUser);
     const style = {
-        margin: '0px',
-        padding: '0px',
+        margin: '10px',
+        padding: '10px',
         width: '100%'
     }
     return <div style={style}>
-        <HelloUser user={firebase.auth().currentUser} />
+        <HelloUser user={currentUser} />
+        <LogoutButton />
     </div>
 }
 
